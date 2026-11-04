@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>pairwise — the two-currency account</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 32 24%27%3E%3Ccircle cx=%2711%27 cy=%2712%27 r=%278%27/%3E%3Ccircle cx=%2721%27 cy=%2712%27 r=%277.25%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27/%3E%3C/svg%3E" />
+  <meta name="description" content="pairwise is a design concept for one account that holds US dollars and Philippine pesos. Every figure is illustrative." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+      <symbol id="i-flip" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></symbol>
+      <symbol id="i-updown" viewBox="0 0 24 24"><path d="m21 16-4 4-4-4"/><path d="M17 20V4"/><path d="m3 8 4-4 4 4"/><path d="M7 4v16"/></symbol>
+      <symbol id="i-snow" viewBox="0 0 24 24"><path d="M2 12h20"/><path d="M12 2v20"/><path d="m20 16-4-4 4-4"/><path d="m4 8 4 4-4 4"/><path d="m16 4-4 4-4-4"/><path d="m8 20 4-4 4 4"/></symbol>
+      <symbol id="i-face" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><path d="M9 9h.01"/><path d="M15 9h.01"/></symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2"/><path d="M12 18h.01"/></symbol>
+      <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+      <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+      <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+      <symbol id="i-out" viewBox="0 0 24 24"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></symbol>
+      <symbol id="i-mark" viewBox="0 0 32 24"><circle cx="11" cy="12" r="8" fill="currentColor" stroke="none"/><circle cx="21" cy="12" r="7.25" fill="none" stroke-width="1.5"/></symbol>
+    </defs>
+  </svg>
+
+  <canvas id="gl" aria-hidden="true"></canvas>
+
+  <!-- HERO -->
+  <section class="sec hero" id="top" data-pose="hero">
+    <header class="nav wrap">
+      <a class="logo" href="#top" aria-label="pairwise home">
+        <svg class="mark"><use href="#i-mark"/></svg><span>pairwise</span>
+      </a>
+      <span class="serial mono">№ PRW 26 0408 A</span>
+      <nav class="links" aria-label="Sections">
+        <a href="#card">Card</a><a href="#swap">Swap</a><a href="#earn">Earn</a><a href="#send">Send</a><a href="#security">Security</a><a href="#plans">Plans</a>
+      </nav>
+      <div class="nav-end">
+        <span class="mono ticker-mini">USD/PHP <b data-rate>58.42</b> <i class="up">▲</i></span>
+        <a class="quiet" href="#join">Log in</a>
+        <a class="btn btn-dark btn-s" href="#join">Get early access<span class="dot"><svg class="i"><use href="#i-arrow"/></svg></span></a>
+        <details class="menu">
+          <summary aria-label="Menu">Menu</summary>
+          <div class="menu-list"><a href="#card">Card</a><a href="#swap">Swap</a><a href="#earn">Earn</a><a href="#send">Send</a><a href="#security">Security</a><a href="#plans">Plans</a></div>
+        </details>
+      </div>
+    </header>
+
+    <div class="wrap hero-grid">
+      <div class="col">
+        <p class="badge"><span class="tag mono">Concept</span>The two-currency account</p>
+        <h1 class="h1">
+          <span class="l1">Heads, it's <em class="gold">dollars.</em></span>
+          <span class="l2">Tails, it's <em class="blue">pesos.</em></span>
+        </h1>
+        <p class="lede">One account for US dollars and Philippine pesos. A metal card that pays in either, swaps at the mid-market rate, and interest on both sides.</p>
+        <div class="actions">
+          <a class="btn btn-dark" href="#join">Get early access<span class="dot"><svg class="i"><use href="#i-arrow"/></svg></span></a>
+          <button class="btn btn-ghost" type="button" data-flip-all><svg class="i"><use href="#i-flip"/></svg>Flip a coin</button>
+        </div>
+      </div>
+
+      <div class="hero-art" aria-hidden="true">
+        <div class="chip chip-rate">
+          <p class="mono lbl">USD → PHP <span class="muted">mid-market</span></p>
+          <p class="fig"><span data-rate>58.42</span></p>
+          <svg class="spark" viewBox="0 0 120 32" preserveAspectRatio="none"><path data-spark d=""/></svg>
+        </div>
+        <div class="chip chip-earned">
+          <p class="mono lbl"><span class="live"></span>Earned today <span class="muted">both sides</span></p>
+          <p class="fig"><span data-earned-today>+₱0.0000</span></p>
+          <p class="mono muted xs">on ₱186,402.50 at 5.20%</p>
+        </div>
+        <p class="hint mono"><span class="live"></span>Click a coin to flip it · drag the card</p>
+      </div>
+    </div>
+
+    <div class="wrap stats">
+      <div class="stat">
+        <p class="mono lbl">Two balances</p>
+        <p class="fig-s">$3,240.18</p>
+        <p class="fig-s">₱186,402.50</p>
+        <p class="xs muted">One account, one card</p>
+      </div>
+      <div class="stat">
+        <p class="mono lbl">Swap fee</p>
+        <p class="fig-m">0.35<small>%</small></p>
+        <div class="meter"><span style="width:35%"></span></div>
+        <p class="xs muted">Shown before you swap</p>
+      </div>
+      <div class="stat stat-ring">
+        <svg class="ring" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16"/><circle class="on" cx="20" cy="20" r="16" pathLength="100" stroke-dasharray="52 100"/></svg>
+        <div>
+          <p class="mono lbl">Interest</p>
+          <p class="fig-s">3.80% <span class="muted">USD</span> · 5.20% <span class="muted">PHP</span></p>
+          <p class="xs muted">Paid daily, no lock-up</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="marquee mono" aria-hidden="true">
+      <div class="marquee-track">
+        <span><i class="live"></i>Illustrative</span><span>USD/PHP <b data-rate>58.42</b> ▲ 0.12%</span><span>PHP/USD 0.01712</span><span>USD interest 3.80%</span><span>PHP interest 5.20%</span><span>Swap fee 0.35%</span><span>Card •••• 0408</span><span>Interest paid daily</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 01 CARD -->
+  <section class="sec" id="card" data-pose="card">
+    <div class="wrap">
+      <div class="col">
+        <p class="eyebrow"><span class="no">№<i>01</i></span><span class="rule"></span>The card<span class="rule rule-s"></span></p>
+        <h2 class="h2">One card.<br><em class="blue">Either</em> currency.</h2>
+        <p class="lede">Pay in pesos at home and dollars abroad. pairwise spends the balance that matches the price, and only swaps when one side runs short.</p>
+
+        <div class="panel">
+          <div class="bal-row">
+            <div class="bal">
+              <p class="mono lbl"><span class="coin-dot gold"></span>US dollar</p>
+              <p class="fig">$1,284.60</p>
+              <p class="mono xs muted">−$12.40 · Corner Deli</p>
+            </div>
+            <div class="bal">
+              <p class="mono lbl"><span class="coin-dot blue"></span>Philippine peso</p>
+              <p class="fig">₱42,318.75</p>
+              <p class="mono xs muted">−₱185.00 · Kapihan</p>
+            </div>
+          </div>
+          <div class="ticks" aria-hidden="true"></div>
+          <div class="panel-head"><p class="mono lbl"><span class="live"></span>Live</p><p class="mono lbl muted">Which balance pays</p></div>
+          <ul class="tx" data-tx>
+            <li><span class="mono muted">09:12</span><span><b>Kapihan sa Kanto</b><small>Makati</small></span><span class="amt">−₱185.00</span><span class="cur php">PHP</span></li>
+            <li><span class="mono muted">09:40</span><span><b>Corner Deli</b><small>New York</small></span><span class="amt">−$12.40</span><span class="cur usd">USD</span></li>
+            <li><span class="mono muted">10:05</span><span><b>Sari-sari Mart</b><small>Cebu City</small></span><span class="amt">−₱420.00</span><span class="cur php">PHP</span></li>
+            <li><span class="mono muted">11:30</span><span><b>Late Noodle Bar</b><small>San Francisco</small></span><span class="amt">−$21.40</span><span class="cur usd">USD</span></li>
+          </ul>
+          <p class="foot xs muted">No foreign transaction fees. Every purchase here is illustrative.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02 SWAP -->
+  <section class="sec" id="swap" data-pose="swap">
+    <div class="wrap">
+      <div class="col">
+        <p class="eyebrow"><span class="no">№<i>02</i></span><span class="rule"></span>Swap<span class="rule rule-s"></span></p>
+        <h2 class="h2">Swap at the<br><em class="blue">mid-market</em> rate.</h2>
+        <p class="lede">Move money between dollars and pesos at the rate banks trade at. One flat 0.35% fee, shown before you confirm.</p>
+
+        <form class="panel swap" data-swap>
+          <div class="panel-head"><p class="mono lbl">Swap</p><p class="mono lbl"><span class="live"></span>Rate locked <b data-lock>0:30</b></p></div>
+          <label class="field">
+            <span class="mono lbl">You swap</span>
+            <span class="field-row"><span class="sym" data-from-sym>$</span><input name="swap-amount" data-amount inputmode="decimal" value="500.00" aria-label="Amount to swap" /><span class="cur" data-from-cur>USD</span></span>
+            <span class="mono xs muted">Balance <span data-from-bal>$3,240.18</span></span>
+          </label>
+          <div class="swap-mid">
+            <button class="icon-btn" type="button" data-dir aria-label="Switch direction"><svg class="i"><use href="#i-updown"/></svg></button>
+            <span class="mono xs muted">at <span data-pair-rate>58.42</span></span>
+          </div>
+          <div class="field">
+            <span class="mono lbl">You get</span>
+            <span class="field-row"><span class="out" data-received>₱29,107.77</span><span class="cur" data-to-cur>PHP</span></span>
+          </div>
+          <div class="ticks" aria-hidden="true"></div>
+          <dl class="kv mono xs">
+            <div><dt>Your rate</dt><dd data-rate-line>1 USD = 58.42 PHP</dd></div>
+            <div><dt>Arrives</dt><dd>Instantly</dd></div>
+            <div><dt>Fee 0.35%</dt><dd data-fee>$1.75</dd></div>
+          </dl>
+          <button class="btn btn-dark btn-wide" type="submit"><span data-swap-label>Swap $500.00 to PHP</span><span class="dot"><svg class="i"><use href="#i-arrow"/></svg></span></button>
+          <p class="foot xs muted">Illustrative rate and fee. Your rate holds for 30 seconds.</p>
+        </form>
+      </div>
+
+      <div class="panel rate-panel">
+        <div class="panel-head">
+          <p class="mono lbl">USD → PHP <span class="muted">mid-market</span></p>
+          <div class="seg mono" role="tablist" data-range>
+            <button role="tab" aria-selected="true">1D</button><button role="tab" aria-selected="false">1W</button><button role="tab" aria-selected="false">1M</button><button role="tab" aria-selected="false">1Y</button>
+          </div>
+        </div>
+        <div class="rate-body">
+          <p class="rate-big"><span data-rate-a>58.4</span><span class="b" data-rate-b>2</span></p>
+          <svg class="rate-chart" viewBox="0 0 240 72" preserveAspectRatio="none"><path class="area" data-chart-area d=""/><path class="line" data-chart d=""/></svg>
+        </div>
+        <p class="mono xs muted"><span class="up">▲ 0.12%</span> today · illustrative</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 02b SETTLE -->
+  <section class="sec" id="settle" data-pose="settle">
+    <div class="wrap">
+      <div class="col">
+        <h2 class="h2">Done before<br>you <em class="blue">blink.</em></h2>
+        <p class="lede">Both balances change the moment you confirm. No cut-off times, no waiting for a banking day.</p>
+        <div class="panel">
+          <div class="panel-head"><p class="mono lbl">Settlement</p><p class="mono lbl muted">Both sides</p></div>
+          <div class="bal-row">
+            <div class="bal">
+              <p class="mono lbl"><span class="coin-dot gold"></span>Dollar balance</p>
+              <p class="fig" data-after-usd>$2,740.18</p>
+              <p class="mono xs muted" data-delta-usd>−$500.00</p>
+            </div>
+            <div class="bal">
+              <p class="mono lbl"><span class="coin-dot blue"></span>Peso balance</p>
+              <p class="fig" data-after-php>₱215,510.27</p>
+              <p class="mono xs up" data-delta-php>+₱29,107.77</p>
+            </div>
+          </div>
+          <div class="settle-bar"><span></span></div>
+          <p class="mono xs muted">Settled in 0.01 s · no cut-off times</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 03 EARN -->
+  <section class="sec" id="earn" data-pose="earn">
+    <div class="wrap">
+      <div class="col">
+        <p class="eyebrow"><span class="no">№<i>03</i></span><span class="rule"></span>Earn<span class="rule rule-s"></span></p>
+        <h2 class="h2">Both balances<br><em class="blue">earn.</em></h2>
+        <p class="lede">Dollars earn 3.80% and pesos earn 5.20% a year, paid daily. No lock-up, no minimum, no tiers to chase.</p>
+
+        <div class="panel earn" data-earn>
+          <div class="panel-head">
+            <p class="mono lbl">Earnings</p>
+            <div class="seg mono" data-earn-cur><button aria-pressed="true" data-cur="USD">USD</button><button aria-pressed="false" data-cur="PHP">PHP</button></div>
+          </div>
+          <div class="earn-top">
+            <div>
+              <p class="mono lbl">Balance</p>
+              <p class="fig fig-l"><span class="coin-dot gold" data-earn-dot></span><span data-earn-bal>$25,000</span></p>
+            </div>
+            <svg class="ring ring-l" viewBox="0 0 40 40"><circle cx="20" cy="20" r="16"/><circle class="on" data-apy-ring cx="20" cy="20" r="16" pathLength="100" stroke-dasharray="38 100"/><text x="20" y="22.5" text-anchor="middle" data-apy-txt>3.80%</text></svg>
+          </div>
+          <input type="range" class="range" name="balance" data-earn-range min="1000" max="250000" step="500" value="25000" aria-label="Balance" />
+          <div class="earn-figs">
+            <div><p class="mono lbl">In 12 months</p><p class="fig-s" data-earn-total>$25,950.00</p></div>
+            <div><p class="mono lbl">Interest in a year</p><p class="fig-s blue" data-earn-year>+$950.00</p></div>
+            <div><p class="mono lbl"><span class="live"></span>Earned today</p><p class="fig-s" data-earn-today>$0.00000</p></div>
+          </div>
+          <div class="ticks" aria-hidden="true"></div>
+          <div class="panel-head"><p class="mono lbl">Interest each month</p><p class="mono lbl muted" data-month-lbl>Month 1 +$77.95</p></div>
+          <div class="bars" data-bars></div>
+          <p class="foot xs muted">Illustrative rates. Paid daily, compounded. Average <span data-earn-avg>+$79.17</span> a month.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 04 SEND -->
+  <section class="sec" id="send" data-pose="send">
+    <div class="wrap">
+      <div class="col">
+        <p class="eyebrow"><span class="no">№<i>04</i></span><span class="rule"></span>Send<span class="rule rule-s"></span></p>
+        <h2 class="h2">Pay anyone,<br><em class="blue">either side.</em></h2>
+        <p class="lede">Send pesos to family in Cebu or dollars to a friend in Chicago. Free between pairwise accounts, there in about two seconds.</p>
+
+        <form class="panel send" data-send>
+          <div class="person">
+            <span class="ava">AR</span>
+            <span><b>You</b><small class="mono">Peso balance</small></span>
+            <span class="fig-s" data-send-bal>₱186,402.50</span>
+          </div>
+          <div class="ticks" aria-hidden="true"></div>
+          <p class="mono lbl">To</p>
+          <div class="people" data-people>
+            <button type="button" aria-pressed="true" data-name="Lia Santos" data-place="Cebu City"><span class="ava a1">LS</span>Lia</button>
+            <button type="button" aria-pressed="false" data-name="Jon Reyes" data-place="Quezon City"><span class="ava a2">JR</span>Jon</button>
+            <button type="button" aria-pressed="false" data-name="Ana Kim" data-place="Chicago"><span class="ava a3">AK</span>Ana</button>
+            <button type="button" aria-pressed="false" data-name="Theo Brooks" data-place="Austin"><span class="ava a4">TB</span>Theo</button>
+            <button type="button" aria-pressed="false" data-name="Paolo Mendoza" data-place="Davao"><span class="ava a5">PM</span>Paolo</button>
+          </div>
+          <div class="send-row">
+            <label class="field-row big"><span class="sym" data-send-sym>₱</span><input name="send-amount" data-send-amt inputmode="decimal" value="2,000.00" aria-label="Amount to send" /></label>
+            <div class="seg mono" data-send-cur><button type="button" aria-pressed="false" data-cur="USD">USD</button><button type="button" aria-pressed="true" data-cur="PHP">PHP</button></div>
+          </div>
+          <p class="mono xs muted"><span data-send-to>Lia Santos · Cebu City</span> · fee ₱0.00 · arrives in about 2 s</p>
+          <button class="btn btn-dark btn-wide" type="submit"><span data-send-label>Send ₱2,000.00 to Lia</span><span class="dot"><svg class="i"><use href="#i-arrow"/></svg></span></button>
+          <p class="foot xs muted">Free between pairwise accounts. Illustrative.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <!-- 05 SECURITY (dark) -->
+  <section class="sec dark" id="security" data-pose="security">
+    <div class="wrap">
+      <div class="col">
+        <p class="big-no" aria-hidden="true">05</p>
+        <p class="eyebrow"><span class="no">№<i>05</i></span><span class="rule"></span>Security<span class="rule rule-s"></span></p>
+        <h2 class="h2">Safe on<br><em class="blue">both faces.</em></h2>
+        <p class="lede">Security that moves as fast as the money. One tap to freeze, your face to approve, and a hold on anything that looks wrong.</p>
+
+        <div class="features">
+          <div class="feat">
+            <svg class="i"><use href="#i-snow"/></svg>
+            <div><b>Freeze in a tap</b><small>Card off in under a second</small></div>
+            <button class="switch" type="button" role="switch" aria-checked="false" aria-label="Freeze card" data-freeze><span></span></button>
+          </div>
+          <div class="feat">
+            <svg class="i"><use href="#i-face"/></svg>
+            <div><b>Approve with your face</b><small>Large transfers and new payees ask first</small></div>
+          </div>
+          <div class="feat">
+            <svg class="i"><use href="#i-phone"/></svg>
+            <div><b>New devices wait</b><small>24-hour hold on money going out</small></div>
+          </div>
+        </div>
+
+        <div class="panel panel-dark log">
+          <div class="panel-head"><p class="mono lbl"><span class="live"></span>Activity log</p><p class="mono lbl muted">Today</p></div>
+          <ul data-log>
+            <li><span class="mono muted">11:30</span><span>Approved with Face ID<small>₱25,000.00 to Lia Santos</small></span><span class="tag ok mono">Approved</span></li>
+            <li><span class="mono muted">10:12</span><span>New device held<small>Pixel 9 · Quezon City</small></span><span class="tag hold mono">Held</span></li>
+            <li><span class="mono muted">09:41</span><span>Kapihan sa Kanto<small>₱185.00 · card present</small></span><span class="tag ok mono">Approved</span></li>
+          </ul>
+          <div class="counts mono">
+            <div><b>128</b><small>Approved</small></div>
+            <div><b>2</b><small>Held</small></div>
+            <div><b class="neg">3</b><small>Declined</small></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 PLANS -->
+  <section class="sec" id="plans" data-pose="plans">
+    <div class="wrap">
+      <div class="col col-wide">
+        <p class="eyebrow"><span class="no">№<i>06</i></span><span class="rule"></span>Plans<span class="rule rule-s"></span></p>
+        <h2 class="h2">Choose your<br><em class="blue">finish.</em></h2>
+        <p class="lede">Three plans, three card finishes. Pick one and the card changes with it. Switch any month.</p>
+
+        <div class="seg mono billing" data-billing><button aria-pressed="true" data-b="m">Monthly</button><button aria-pressed="false" data-b="y">Yearly · 2 months free</button></div>
+
+        <div class="plans" data-plans role="radiogroup" aria-label="Plan">
+          <button class="plan" role="radio" aria-checked="false" data-plan="Standard" data-finish="ivory" data-m="0" data-y="0">
+            <span class="mono lbl">Standard</span>
+            <span class="price"><span data-price>Free</span></span>
+            <span class="xs muted">Ivory finish · recycled plastic</span>
+          </button>
+          <button class="plan" role="radio" aria-checked="true" data-plan="Plus" data-finish="graphite" data-m="490" data-y="408">
+            <span class="mono lbl">Plus</span>
+            <span class="price"><span data-price>₱490</span><small>/ month</small></span>
+            <span class="xs muted">Graphite · brushed titanium</span>
+          </button>
+          <button class="plan" role="radio" aria-checked="false" data-plan="Reserve" data-finish="gold" data-m="1290" data-y="1075">
+            <span class="mono lbl">Reserve</span>
+            <span class="price"><span data-price>₱1,290</span><small>/ month</small></span>
+            <span class="xs muted">Gold-plated steel</span>
+          </button>
+        </div>
+
+        <table class="compare">
+          <caption class="sr">What each plan includes</caption>
+          <thead><tr><th scope="col"><span class="sr">Feature</span></th><th scope="col" class="mono">Std</th><th scope="col" class="mono">Plus</th><th scope="col" class="mono">Res</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Two balances with interest</th><td><svg class="i"><use href="#i-check"/></svg></td><td><svg class="i"><use href="#i-check"/></svg></td><td><svg class="i"><use href="#i-check"/></svg></td></tr>
+            <tr><th scope="row">Virtual cards</th><td class="mono">1</td><td class="mono">5</td><td class="mono">20</td></tr>
+            <tr><th scope="row">Support day and night</th><td><svg class="i dim"><use href="#i-minus"/></svg></td><td><svg class="i"><use href="#i-check"/></svg></td><td><svg class="i"><use href="#i-check"/></svg></td></tr>
+            <tr><th scope="row">Joint and sub-accounts</th><td><svg class="i dim"><use href="#i-minus"/></svg></td><td><svg class="i"><use href="#i-check"/></svg></td><td><svg class="i"><use href="#i-check"/></svg></td></tr>
+            <tr><th scope="row">A named account manager</th><td><svg class="i dim"><use href="#i-minus"/></svg></td><td><svg class="i dim"><use href="#i-minus"/></svg></td><td><svg class="i"><use href="#i-check"/></svg></td></tr>
+          </tbody>
+        </table>
+        <div class="actions">
+          <a class="btn btn-dark" href="#join"><span data-plan-cta>Get Plus</span><span class="dot"><svg class="i"><use href="#i-arrow"/></svg></span></a>
+          <span class="mono xs muted">Prices are illustrative</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 07 APP -->
+  <section class="sec" id="app" data-pose="app">
+    <div class="wrap">
+      <div class="col">
+        <p class="eyebrow"><span class="no">№<i>07</i></span><span class="rule"></span>The app<span class="rule rule-s"></span></p>
+        <h2 class="h2">Two currencies,<br><em class="blue">one screen.</em></h2>
+        <p class="lede">Balances, the live rate, every swap and payment in one list. The app is the account.</p>
+      </div>
+      <div class="app-win panel">
+        <aside class="app-side">
+          <div class="person"><span class="ava">AR</span><span><b>Alex Rivera</b><small class="mono">Plus · Graphite</small></span></div>
+          <div class="app-rate"><p class="mono lbl">USD/PHP</p><p class="fig"><span data-rate>58.42</span></p><p class="mono xs muted">Mid-market · illustrative</p></div>
+          <div class="app-bal"><p class="mono lbl"><span class="coin-dot gold"></span>Dollars</p><p class="fig-s">$3,240.18</p></div>
+          <div class="app-bal"><p class="mono lbl"><span class="coin-dot blue"></span>Pesos</p><p class="fig-s">₱186,402.50</p></div>
+        </aside>
+        <div class="app-main">
+          <div class="panel-head"><p class="mono lbl">Activity</p><a class="mono lbl quiet" href="#app">See all</a></div>
+          <ul class="tx tx-app">
+            <li><span class="ico"><svg class="i"><use href="#i-out"/></svg></span><span><b>Kapihan sa Kanto</b><small>Makati · card</small></span><span class="amt">−₱185.00</span></li>
+            <li><span class="ico"><svg class="i"><use href="#i-updown"/></svg></span><span><b>Swap</b><small>USD to PHP at 58.42</small></span><span class="amt up">+₱29,107.77</span></li>
+            <li><span class="ico"><svg class="i"><use href="#i-plus"/></svg></span><span><b>Interest</b><small>Both balances</small></span><span class="amt up">+$0.34</span></li>
+            <li><span class="ava a1 sm">LS</span><span><b>Lia Santos</b><small>Dinner on Saturday</small></span><span class="amt up">+₱1,200.00</span></li>
+            <li><span class="ico"><svg class="i"><use href="#i-out"/></svg></span><span><b>Bay Transit</b><small>San Francisco · card</small></span><span class="amt">−$2.75</span></li>
+          </ul>
+        </div>
+        <div class="app-card">
+          <p class="mono lbl">Card</p>
+          <div class="mini-card"><svg class="mark"><use href="#i-mark"/></svg><span class="chip-c"></span><span class="mono">•••• 0408</span></div>
+          <p class="xs"><b>Graphite</b> <span class="muted">brushed titanium</span></p>
+          <p class="mono xs"><span class="live"></span>Active · <span class="muted">2 virtual</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 08 FAQ -->
+  <section class="sec" id="faq" data-pose="faq">
+    <div class="wrap faq-grid">
+      <div class="col">
+        <p class="eyebrow"><span class="no">№<i>08</i></span><span class="rule"></span>Questions<span class="rule rule-s"></span></p>
+        <h2 class="h2">Asked and<br><em class="blue">answered.</em></h2>
+        <p class="faq-no" aria-hidden="true" data-faq-no>01</p>
+        <a class="quiet arrow-link" href="#join">Join the early access list <svg class="i"><use href="#i-arrow"/></svg></a>
+      </div>
+      <div class="faq" data-faq>
+        <details open><summary><span class="mono">01</span>Is pairwise a bank?<svg class="i"><use href="#i-plus"/></svg></summary><p>No. pairwise is a design concept. It opens no accounts and holds no money.</p></details>
+        <details><summary><span class="mono">02</span>Where would the interest come from?<svg class="i"><use href="#i-plus"/></svg></summary><p>In a real product, balances would sit with partner banks and money-market funds. The rates on this page are illustrative.</p></details>
+        <details><summary><span class="mono">03</span>What is the card made of?<svg class="i"><use href="#i-plus"/></svg></summary><p>Plus is brushed titanium and Reserve is gold-plated steel. Standard is recycled plastic in an ivory finish.</p></details>
+        <details><summary><span class="mono">04</span>How does the rate work?<svg class="i"><use href="#i-plus"/></svg></summary><p>You see the mid-market rate and a flat 0.35% fee before you confirm. The rate holds for 30 seconds.</p></details>
+        <details><summary><span class="mono">05</span>How does freezing work?<svg class="i"><use href="#i-plus"/></svg></summary><p>One tap turns the card off for every purchase. Tap again and it is back on.</p></details>
+        <details><summary><span class="mono">06</span>Can I send to other banks?<svg class="i"><use href="#i-plus"/></svg></summary><p>In the concept, transfers to other Philippine and US banks take one business day. Between pairwise accounts they are instant.</p></details>
+        <details><summary><span class="mono">07</span>Can I sign up?<svg class="i"><use href="#i-plus"/></svg></summary><p>Not for real. The early access form below is part of the concept and sends nothing.</p></details>
+      </div>
+    </div>
+  </section>
+
+  <!-- 09 EARLY ACCESS (dark) + FOOTER -->
+  <section class="sec dark cta" id="join" data-pose="cta">
+    <div class="wrap">
+      <p class="eyebrow center">Early access</p>
+      <h2 class="h-cta">Flip for <em class="gold">it.</em></h2>
+      <div class="cta-grid">
+        <div class="toss">
+          <p class="lede">Call it in the air. Heads or tails, you land on the list either way.</p>
+          <p class="mono lbl">Tally, this visit</p>
+          <div class="tally">
+            <div><b data-heads>0</b><small class="mono">Heads · $</small></div>
+            <div class="tally-bar"><span data-tally-bar></span></div>
+            <div><b data-tails>0</b><small class="mono">Tails · ₱</small></div>
+          </div>
+          <p class="mono xs muted"><span data-tosses>0</span> tosses</p>
+          <button class="btn btn-light" type="button" data-toss><svg class="i"><use href="#i-flip"/></svg><span data-toss-label>Toss the coin</span></button>
+          <p class="xs muted">Heads, it's dollars. Tails, it's pesos.</p>
+        </div>
+
+        <form class="panel panel-dark join" data-join>
+          <p class="mono lbl">Join the early access list</p>
+          <label class="in"><span class="mono xs muted">Email</span><input name="email" type="email" required placeholder="you@example.com" autocomplete="email" /></label>
+          <label class="in"><span class="mono xs muted">Plan</span>
+            <select name="plan" data-join-plan><option>Standard · Ivory</option><option selected>Plus · Graphite</option><option>Reserve · Gold</option></select>
+          </label>
+          <button class="btn btn-light btn-wide" type="submit"><span data-join-label>Join the list</span><span class="dot"><svg class="i"><use href="#i-arrow"/></svg></span></button>
+          <p class="xs muted" data-join-note>A concept list. No account is opened and nothing is sent.</p>
+        </form>
+      </div>
+    </div>
+
+    <div class="marquee mono dim" aria-hidden="true">
+      <div class="marquee-track">
+        <span>pairwise</span><span>Heads, it's dollars</span><span>Tails, it's pesos</span><span>A design concept</span><span>Series 26</span>
+      </div>
+    </div>
+
+    <footer class="wrap footer" data-pose="footer">
+      <div class="f-brand">
+        <a class="logo" href="#top"><svg class="mark"><use href="#i-mark"/></svg><span>pairwise</span></a>
+        <p class="xs muted">pairwise is a design concept. It is not a bank and opens no accounts. Every rate, fee and figure on this page is illustrative.</p>
+      </div>
+      <nav class="f-col" aria-label="Product"><p class="mono lbl">Product</p><a href="#card">Card</a><a href="#swap">Swap</a><a href="#earn">Earn</a><a href="#send">Send</a><a href="#security">Security</a><a href="#plans">Plans</a></nav>
+      <nav class="f-col" aria-label="Concept"><p class="mono lbl">Concept</p><a href="#app">The app</a><a href="#faq">Questions</a><a href="#join">Early access</a><a href="#top">Back to the top</a></nav>
+      <p class="mono xs muted f-copy">© 2026 pairwise</p>
+      <p class="wordmark" aria-hidden="true">pairwise</p>
+    </footer>
+  </section>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
