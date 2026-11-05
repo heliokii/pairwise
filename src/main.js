@@ -1,12 +1,13 @@
 import './style.css';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { MotionPathPlugin } from 'gsap/MotionPathPlugin';
 import Lenis from 'lenis';
 import { RATE, APY, swap, earn, fmt } from './money.js';
 import { loadFonts } from './textures.js';
-import { createScene, POSES } from './scene.js';
+import { createScene, POSES, LAG } from './scene.js';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, MotionPathPlugin);
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const $ = (s, r = document) => r.querySelector(s);
 const $$ = (s, r = document) => [...r.querySelectorAll(s)];
@@ -315,28 +316,40 @@ function fillMarquees() {
 /* ---------------- scroll choreography ---------------- */
 const sections = $$('[data-pose]');
 let tl = null;
-function setPose(P) { for (const k in P) if (k !== 'path') Object.assign(scene.S[k], P[k]); }
+function setPose(P) { for (const k in P) if (k in scene.S) Object.assign(scene.S[k], P[k]); }
 function buildTimeline() {
   tl?.scrollTrigger?.kill();
   tl?.kill();
   setPose(POSES.hero);
+  const gl = $('#gl');
+  gsap.set(gl, { opacity: 1 });
   const vh = innerHeight, max = ScrollTrigger.maxScroll(window);
+  const mobile = innerWidth <= 900;
   const top = (el) => el.getBoundingClientRect().top + scrollY; // footer sits inside a section, so not offsetTop
-  tl = gsap.timeline({ defaults: { ease: 'none' }, paused: true });
+  tl = gsap.timeline({ defaults: { ease: 'sine.inOut' }, paused: true });
   sections.forEach((el, i) => {
     if (!i) return;
-    const P = POSES[el.dataset.pose];
-    const start = Math.max(0, Math.min(top(el) - vh * 0.9, max - vh * 0.3));
-    const dur = Math.max(1, Math.min(vh * 0.75, max - start));
+    const name = el.dataset.pose, P = POSES[name];
+    // on phones the coins sit low on the screen, so they change while the gap between sections passes them
+    const start = Math.max(0, Math.min(top(el) - vh * (mobile ? 1.25 : 0.9), max - vh * 0.3));
+    const dur = Math.max(1, Math.min(vh * (mobile ? 0.6 : 0.75), max - start));
     for (const k in P) {
+      if (k === 'mid') continue;
       if (k === 'path') {
         // runs from mid-entry until the next section starts pulling objects away
         const from = top(el) - vh * 0.5, to = top(el) + el.offsetHeight - vh * 0.9;
-        const step = Math.max(1, to - from) / P.path.frames.length;
-        tl.to(scene.S[P.path.target], { keyframes: P.path.frames.map((f) => ({ ...f, duration: step })) }, from);
-      } else {
-        tl.to(scene.S[k], { ...P[k], duration: dur }, start);
+        const { x, y, ...rest } = Object.assign({}, ...P.path.frames);
+        tl.to(scene.S[P.path.target], { motionPath: { path: P.path.frames.map(({ x, y }) => ({ x, y })), curviness: 1.2 }, ...rest, duration: Math.max(1, to - from) }, from);
+        continue;
       }
+      const lag = (LAG[k] || 0) * dur, d = k in LAG ? dur * 0.84 : dur;
+      const mid = P.mid?.[k];
+      tl.to(scene.S[k], { ...(mid ? { keyframes: { '50%': mid, '100%': P[k], easeEach: 'sine.inOut' }, ease: 'none' } : P[k]), duration: d }, start + lag);
+    }
+    // phones: dim the coins while this section's text scrolls over them, bring them back for the next gap
+    if (mobile && name !== 'cta' && name !== 'footer') {
+      tl.to(gl, { opacity: 0.25, duration: vh * 0.15 }, start + dur)
+        .to(gl, { opacity: 1, duration: vh * 0.15 }, Math.max(start + dur + vh * 0.15, top(el) + el.offsetHeight - vh * 1.4));
     }
   });
   tl.set({}, {}, max);
@@ -369,8 +382,11 @@ async function init() {
     $('#gl').remove();
   }
   ScrollTrigger.refresh();
-  let rt;
+  let rt, lastW = innerWidth, lastH = innerHeight;
   window.addEventListener('resize', () => {
+    // phone URL bars fire height-only resizes while scrolling; rebuilding then makes the coins jump
+    if (innerWidth === lastW && Math.abs(innerHeight - lastH) < 160) return;
+    lastW = innerWidth; lastH = innerHeight;
     clearTimeout(rt);
     rt = setTimeout(() => { fillMarquees(); if (scene) buildTimeline(); ScrollTrigger.refresh(); }, 200);
   });

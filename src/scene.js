@@ -11,38 +11,43 @@ const OFF = (p = {}) => o({ x: 2.3, y: 0.2, z: -1.5, s: 0.8, ...p });
 /*
  * One pose per section. x and y are fractions of the half-viewport (x 0.5 = middle of the right half).
  * `k` holds scalar effects: coin stacks (earn), dark-section light (fx) and the card's light beam.
- * `path` replaces a straight move with keyframes across the whole section.
+ * `mid` adds a halfway keyframe so objects arc around each other instead of passing through.
+ * `path` replaces a straight move with a curve across the whole section.
  */
 export const POSES = {
   hero: {
     card: o({ x: 0.42, y: 0.06, rx: 0.06, ry: -0.38, rz: 0.05, s: 1.2 }),
     usd: o({ x: 0.27, y: -0.42, z: 1, rx: 0.12, ry: 0.45, rz: -0.05, s: 1.15 }),
     php: o({ x: 0.74, y: -0.12, z: 0.6, rx: 0.08, ry: -0.5, s: 1.05 }),
-    pair: o({ x: 0.45, y: -1.6, s: 0 }),
+    pair: o({ x: 0.45, y: 1.6, s: 0 }), // waits above, drops in for the CTA
     rings: { x: 0.45, y: 0, s: 1, o: 1 },
     k: { stacks: 0, fx: 0, beam: 0 },
   },
   card: {
     card: o({ x: 0.5, y: -0.02, z: 0.4, ry: -0.15, rz: -0.03, s: 1.32 }),
-    usd: o({ x: 0.2, y: 0.08, z: -0.6, ry: 1.5, rz: 0.15, s: 1 }),
-    php: o({ x: 0.82, y: 0.05, z: -0.4, ry: -1.45, rz: -0.1, s: 0.9 }),
+    // in front of the card: on phones there is no room to pass round its edges to get behind it
+    usd: o({ x: 0.2, y: 0.08, z: 1.3, ry: 1.5, rz: 0.15, s: 1 }),
+    php: o({ x: 0.82, y: 0.05, z: 1.3, ry: -1.45, rz: -0.1, s: 0.9 }),
     rings: { x: 0.5, y: 0, s: 1.1, o: 1 },
   },
   swap: {
     card: OFF({ ry: -1, rz: 0.2 }),
     usd: o({ x: 0.32, y: 0.12, z: 0.4, rx: 0.05, ry: Math.PI + 0.28, s: 1.45 }),
-    php: o({ x: 0.66, y: 0.06, rx: 0.05, ry: Math.PI - 0.32, s: 1.3 }),
+    php: o({ x: 0.66, y: 0.06, z: -0.7, rx: 0.05, ry: Math.PI - 0.32, s: 1.3 }),
     rings: { x: 0.5, y: 0.08, s: 1.15, o: 1 },
   },
   settle: {
     usd: o({ x: 0.68, y: 0.1, ry: TAU + 0.3, s: 1.3 }),
     php: o({ x: 0.34, y: 0.14, z: 0.4, ry: TAU - 0.3, s: 1.45 }),
+    // the coins trade places, dollars over the top and pesos underneath, swapping depth at the widest point
+    mid: { usd: { y: 0.62, z: 0.2 }, php: { y: -0.42, z: 0.2 } },
   },
   earn: {
     usd: o({ x: 0.56, y: 0.04, z: 1.2, rx: 0.35, ry: TAU + 0.2, s: 0.75 }),
     php: o({ x: 0.4, y: 0.32, z: -0.5, ry: TAU - 0.2, s: 0.6 }),
     rings: { x: 0.5, y: -0.05, s: 1, o: 0.8 },
     k: { stacks: 1 },
+    mid: { usd: { y: -0.35, z: 0.3 }, php: { y: 0.7, z: 0.3 } }, // one dips, one rises, so they pass at the widest point
   },
   send: {
     card: o({ x: 0.92, y: 0.3, z: -0.6, rx: 0.1, ry: -0.6, rz: 0.15, s: 0.8 }),
@@ -58,6 +63,7 @@ export const POSES = {
     },
     rings: { x: 0.5, y: 0, s: 1, o: 0.7 },
     k: { stacks: 0 },
+    mid: { usd: { x: 0.05, y: 0.3, z: 0.4 } }, // left of the pesos first, then up and back
   },
   security: {
     card: o({ x: 0.55, y: 0, z: 0, ry: 1.32, s: 1.5 }), // ~edge-on to the camera at this x
@@ -65,16 +71,21 @@ export const POSES = {
     php: o({ x: 0.3, y: -0.32, z: 0.8, ry: TAU * 2 - 0.5, s: 0.6 }),
     rings: { x: 0.55, y: 0, s: 1.35, o: 1 },
     k: { fx: 1, beam: 1 },
+    // dollars come over the top, pesos swing toward the camera, both clear of the edge-on card
+    mid: { usd: { x: 0.8, y: 0.7, z: 1.2 }, php: { x: 0.55, y: -0.1, z: 1.9 } },
   },
   plans: {
-    card: o({ x: 0.66, y: 0, z: 0.4, ry: TAU - 0.3, rz: 0.04, s: 1.35 }),
-    usd: o({ x: 0.47, y: 0.58, z: -0.8, ry: TAU + 1.1, s: 0.5 }),
-    php: o({ x: 0.86, y: -0.58, z: 0.6, ry: TAU * 2 - 0.6, s: 0.45 }),
+    // a quarter turn back to face-on; a full spin here sweeps through both coins
+    card: o({ x: 0.66, y: 0, z: 0.4, ry: -0.3, rz: 0.04, s: 1.35 }),
+    usd: o({ x: 0.47, y: 0.62, z: -0.8, ry: TAU + 1.1, s: 0.5 }),
+    php: o({ x: 0.86, y: -0.66, z: 0.6, ry: TAU * 2 - 0.6, s: 0.45 }),
     rings: { x: 0.66, y: 0, s: 1, o: 0.9 },
     k: { fx: 0, beam: 0 },
+    // dollars stay in front until they clear the card's top edge, pesos dip under its bottom one
+    mid: { usd: { x: 0.5, y: 0.8, z: 0.9 }, php: { y: -0.75, z: 1.1 } },
   },
   app: {
-    card: o({ x: 0.62, y: 0.5, z: -0.6, rx: 0.55, ry: TAU + 0.35, rz: 0.5, s: 0.95 }),
+    card: o({ x: 0.62, y: 0.5, z: -0.6, rx: 0.55, ry: 0.35, rz: 0.5, s: 0.95 }),
     usd: OFF({ s: 0.5 }),
     php: OFF({ y: -0.3, s: 0.5 }),
     rings: { x: 0.6, y: -0.2, s: 1.2, o: 0.4 },
@@ -87,20 +98,24 @@ export const POSES = {
   },
   cta: {
     pair: o({ x: 0, y: 0.04, z: 0.5, rx: 0.12, ry: 0.3, s: 1.75 }),
-    card: o({ x: -0.14, y: -0.56, z: 0.2, rx: -1.05, ry: TAU + 0.15, rz: 0.55, s: 0.9 }),
+    card: o({ x: -0.14, y: -0.56, z: 0.2, rx: -1.05, ry: 0.15, rz: 0.55, s: 0.9 }),
     php: o({ x: 0.2, y: -0.52, z: 1, rx: -0.8, ry: TAU * 2, s: 0.45 }),
     usd: o({ x: -0.3, y: 0.5, z: -1, s: 0 }),
     rings: { x: 0, y: 0, s: 1.5, o: 1 },
     k: { fx: 1 },
   },
-  // everything drifts up and out so the footer reads clean
+  // everything drifts up and out so the footer reads clean; y is high enough to leave a phone screen too
   footer: {
-    pair: o({ x: 0, y: 1.9, z: 0.5, rx: 0.4, ry: 0.3, s: 1.4 }),
-    card: o({ x: -0.14, y: 1.6, z: 0.2, rx: -0.6, ry: TAU + 0.6, rz: 0.55, s: 0.9 }),
-    php: o({ x: 0.2, y: 1.7, z: 1, rx: -0.8, ry: TAU * 2, s: 0.45 }),
+    pair: o({ x: 0.25, y: 4.2, z: 0.5, rx: 0.4, ry: 0.3, s: 1.4 }),
+    card: o({ x: -0.8, y: 3.9, z: 0.2, rx: -0.6, ry: 0.6, rz: 0.55, s: 0.9 }),
+    php: o({ x: 0.55, y: 3.6, z: 1, rx: -0.8, ry: TAU * 2, s: 0.45 }),
     rings: { x: 0, y: 1.2, s: 1.5, o: 0.6 },
+    mid: { card: { x: -0.8, y: -0.3 } }, // out to the left first, then up past the coin
   },
 };
+
+// Share of each pose move an object waits before starting: the card leads, the coins follow.
+export const LAG = { card: 0, usd: 0.08, php: 0.16, pair: 0.08 };
 
 export function createScene(canvas, { reduced = false } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
@@ -138,10 +153,12 @@ export function createScene(canvas, { reduced = false } = {}) {
   const glowTex = T.glow();
   const halo = (color, size) => {
     const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color, blending: THREE.AdditiveBlending, transparent: true, depthWrite: false, opacity: 0 }));
-    s.scale.setScalar(size); s.position.z = -0.2;
+    s.scale.setScalar(size); s.userData.size = size;
     return s;
   };
-  const halos = [usd.add(halo(0xffc865, 3.2)) && usd.children[0], php.add(halo(0x6f7cff, 3.2)) && php.children[0], pair.add(halo(0xffc865, 3.6)) && pair.children[0]];
+  // world-space, not coin children: a child halo swings in front of the face when the coin tilts
+  const halos = [[usd, halo(0xffc865, 3.2)], [php, halo(0x6f7cff, 3.2)], [pair, halo(0xffc865, 3.6)]];
+  scene.add(...halos.map(([, h]) => h));
 
   /* ---- card ---- */
   const cardGeo = new RoundedBoxGeometry(1.62, 2.57, 0.035, 6, 0.1);
@@ -203,27 +220,83 @@ export function createScene(canvas, { reduced = false } = {}) {
   const sparks = new THREE.Points(cloud(420, 7), sparkMat);
   rings.add(dust, sparks);
 
-  /* ---- comet trails ---- */
+  /* ---- comet trails: the tail fades and narrows behind a moving head, in the shader ---- */
   const trails = [];
   const trailSpec = [
     { color: 0xffc865, rot: [0.5, 0.2, 0.3], R: 2.2, speed: 0.22 },
     { color: 0x7d88ff, rot: [-0.6, 0.4, -0.5], R: 2.6, speed: 0.17 },
     { color: 0xffffff, rot: [1.2, -0.3, 0.9], R: 1.9, speed: 0.27 },
   ];
+  const trailMat = (color) => new THREE.ShaderMaterial({
+    uniforms: { uColor: { value: new THREE.Color(color) }, uHead: { value: 0 }, uOpacity: { value: 0 } },
+    vertexShader: /* glsl */ `
+      uniform float uHead;
+      varying float vA;
+      void main() {
+        // uv.x runs along the loop; fract() keeps the tail whole where the loop closes
+        vA = clamp(1.0 - fract(uHead - uv.x) / 0.42, 0.0, 1.0);
+        vec3 p = position - normal * 0.016 * (1.0 - vA);
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0);
+      }`,
+    fragmentShader: /* glsl */ `
+      uniform vec3 uColor;
+      uniform float uOpacity;
+      varying float vA;
+      void main() {
+        gl_FragColor = vec4(uColor, uOpacity * vA * vA);
+        #include <tonemapping_fragment>
+        #include <colorspace_fragment>
+      }`,
+    transparent: true, depthWrite: false, blending: THREE.AdditiveBlending,
+  });
   for (const t of trailSpec) {
     const pts = Array.from({ length: 64 }, (_, i) => {
       const a = (i / 63) * TAU;
       return new THREE.Vector3(Math.cos(a) * t.R, Math.sin(a) * t.R * 0.42, 0);
     });
     const curve = new THREE.CatmullRomCurve3(pts, true);
-    const geo = new THREE.TubeGeometry(curve, 300, 0.012, 6, true);
-    const mat = new THREE.MeshBasicMaterial({ color: t.color, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false });
-    const mesh = new THREE.Mesh(geo, mat);
-    const head = halo(t.color, 0.7); head.position.z = 0;
+    const mesh = new THREE.Mesh(new THREE.TubeGeometry(curve, 300, 0.016, 6, true), trailMat(t.color));
+    const head = halo(t.color, 0.7);
     const g = new THREE.Group();
     g.add(mesh, head); g.rotation.set(...t.rot);
     rings.add(g);
-    trails.push({ mesh, head, curve, speed: t.speed, segs: 300, rad: 6 });
+    trails.push({ mesh, head, curve, speed: t.speed });
+  }
+
+  /* ---- coin streaks: a fading ribbon behind each coin while it travels ---- */
+  const N = 24;
+  // [coin, ink on light sections, glow on dark ones]
+  const streaks = [[usd, 0x94701f, 0xffc865], [php, 0x2b35e0, 0x7d88ff], [pair, 0x94701f, 0xffc865]].map(([coin, ink, glow]) => {
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(N * 6), 3));
+    geo.setAttribute('color', new THREE.BufferAttribute(new Float32Array(N * 8).fill(1), 4)); // white; alpha set per frame
+    geo.setIndex(Array.from({ length: N - 1 }, (_, i) => [2 * i, 2 * i + 1, 2 * i + 2, 2 * i + 1, 2 * i + 3, 2 * i + 2]).flat());
+    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, depthWrite: false, side: THREE.DoubleSide }));
+    mesh.frustumCulled = false;
+    scene.add(mesh);
+    const hist = Array.from({ length: N }, () => new THREE.Vector3());
+    return { coin, mesh, hist, ink: new THREE.Color(ink), glow: new THREE.Color(glow), amt: 0, primed: false };
+  });
+  function updateStreak(st, fx) {
+    const { coin, mesh, hist } = st;
+    if (!st.primed) { for (const v of hist) v.copy(coin.position); st.primed = true; }
+    hist.unshift(hist.pop().copy(coin.position));
+    st.amt += (Math.min(1, hist[0].distanceTo(hist[1]) * 14) - st.amt) * 0.12;
+    mesh.visible = !reduced && coin.visible && st.amt > 0.02;
+    if (!mesh.visible) return;
+    mesh.material.color.copy(st.ink).lerp(st.glow, fx);
+    const { position: pos, color: col } = mesh.geometry.attributes;
+    const r = 0.31 * coin.scale.x;
+    for (let i = 0; i < N; i++) {
+      const p = hist[i], a = hist[Math.max(0, i - 1)], b = hist[Math.min(N - 1, i + 1)];
+      const l = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      const nx = -(a.y - b.y) / l, ny = (a.x - b.x) / l; // across the direction of travel
+      const f = 1 - i / (N - 1), w = r * f, alpha = f * f * st.amt * 0.55;
+      pos.setXYZ(2 * i, p.x + nx * w, p.y + ny * w, p.z - 0.1);
+      pos.setXYZ(2 * i + 1, p.x - nx * w, p.y - ny * w, p.z - 0.1);
+      col.setW(2 * i, alpha); col.setW(2 * i + 1, alpha);
+    }
+    pos.needsUpdate = col.needsUpdate = true;
   }
 
   /* ---- coin stacks (earn) ---- */
@@ -264,30 +337,37 @@ export function createScene(canvas, { reduced = false } = {}) {
     rings: { x: 0.45, y: 0, s: 1, o: 1 },
     k: { stacks: 0, fx: 0, beam: 0 },
   };
-  const F = { usd: 0, php: 0, pair: 0, card: 0, lift: 0 }; // user-driven spin offsets
+  const F = { usd: 0, php: 0, card: 0, pairX: 0, pairZ: 0, lift: 0 }; // user-driven spin offsets
   const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+  // entrance still to play, 1 → 0; added on top of the scroll pose so the two never fight
+  const I = { card: reduced ? 0 : 1, usd: reduced ? 0 : 1, php: reduced ? 0 : 1 };
+  if (!reduced) ['card', 'usd', 'php'].forEach((n, i) => gsap.to(I, { [n]: 0, duration: 1.4, delay: 0.1 + i * 0.12, ease: 'power3.out' }));
 
   let halfW = 1, halfH = 1, mobile = false, k = 1;
   function resize() {
-    const w = window.innerWidth, h = window.innerHeight;
+    // the canvas box, not innerHeight: mobile URL bars change one without the other
+    const w = canvas.clientWidth || innerWidth, h = canvas.clientHeight || innerHeight;
+    mobile = w <= 900; // same breakpoint as the CSS
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, mobile ? 1.5 : 2));
     renderer.setSize(w, h, false);
     camera.aspect = w / h; camera.updateProjectionMatrix();
     halfH = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)) * camera.position.z;
     halfW = halfH * camera.aspect;
-    mobile = w < 900;
-    k = mobile ? Math.min(0.8, halfW / 2.4) : 1;
+    // positions are fractions of the width, so narrower desktops shrink the objects with them (poses are tuned at 16:10)
+    k = mobile ? Math.min(0.8, halfW / 2.4) : Math.min(1, camera.aspect / 1.6);
+    for (const s of streaks) s.primed = false; // positions jump on resize, so no streak
   }
   resize();
   window.addEventListener('resize', resize);
 
-  function X(px) { return mobile ? (px - S.rings.x) * halfW * 0.9 : px * halfW; }
-  function Y(py) { return mobile ? py * halfH * 0.42 - halfH * 0.48 : py * halfH; }
+  function X(px) { return mobile ? (px - S.rings.x) * halfW * 1.25 : px * halfW; }
+  function Y(py) { return mobile ? py * halfH * 0.62 - halfH * 0.48 : py * halfH; }
 
-  function place(mesh, p, t, phase, extra = {}) {
+  function place(mesh, p, t, phase, extra = {}, intro = 0) {
     const bob = reduced ? 0 : Math.sin(t * 0.9 + phase) * 0.04;
-    mesh.position.set(X(p.x), Y(p.y) + bob + (extra.y || 0), p.z);
-    mesh.rotation.set(p.rx + (extra.rx || 0), p.ry + (extra.ry || 0), p.rz);
-    mesh.scale.setScalar(Math.max(1e-4, p.s * k));
+    mesh.position.set(X(p.x), Y(p.y) + bob + (extra.y || 0) - intro * 1.4, p.z);
+    mesh.rotation.set(p.rx + (extra.rx || 0), p.ry + (extra.ry || 0) - intro * 2.4, p.rz + (extra.rz || 0));
+    mesh.scale.setScalar(Math.max(1e-4, p.s * k * (1 - intro * 0.5)));
     mesh.visible = p.s > 0.01;
   }
 
@@ -300,10 +380,11 @@ export function createScene(canvas, { reduced = false } = {}) {
     pointer.x += (pointer.tx - pointer.x) * 0.06;
     pointer.y += (pointer.ty - pointer.y) * 0.06;
 
-    place(card, S.card, t, 0, { ry: F.card + pointer.x * 0.18, rx: -pointer.y * 0.12 });
-    place(usd, S.usd, t, 1.3, { ry: F.usd });
-    place(php, S.php, t, 2.1, { ry: F.php });
-    place(pair, S.pair, t, 0.4, { ry: F.pair, y: F.lift });
+    place(card, S.card, t, 0, { ry: F.card + pointer.x * 0.18, rx: -pointer.y * 0.12 }, I.card);
+    place(usd, S.usd, t, 1.3, { ry: F.usd }, I.usd);
+    place(php, S.php, t, 2.1, { ry: F.php }, I.php);
+    place(pair, S.pair, t, 0.4, { rx: F.pairX, rz: F.pairZ, y: F.lift });
+    for (const st of streaks) updateStreak(st, fx);
 
     rings.position.set(X(S.rings.x), Y(S.rings.y), -1.5);
     rings.scale.setScalar(S.rings.s * k * 1.15);
@@ -314,16 +395,20 @@ export function createScene(canvas, { reduced = false } = {}) {
     sparkMat.opacity = 0.9 * fx;
     dust.rotation.y = sparks.rotation.y = t * 0.03;
 
-    for (const h of halos) h.material.opacity = fx * 0.85;
+    for (const [coin, h] of halos) {
+      h.position.copy(coin.position);
+      h.position.z -= coin.scale.x * 0.8; // past the coin's radius, so it stays behind at any tilt
+      h.scale.setScalar(h.userData.size * coin.scale.x);
+      h.material.opacity = fx * 0.85;
+      h.visible = coin.visible && fx > 0.01;
+    }
     for (const tr of trails) {
-      tr.mesh.material.opacity = fx;
+      tr.mesh.material.uniforms.uOpacity.value = fx;
       tr.head.material.opacity = fx;
       tr.mesh.visible = tr.head.visible = fx > 0.01;
       if (!tr.mesh.visible) continue;
       const p = reduced ? 0.6 : (t * tr.speed) % 1;
-      const len = 0.35, from = Math.max(0, p - len);
-      const per = tr.rad * 6;
-      tr.mesh.geometry.setDrawRange(Math.floor(from * tr.segs) * per, Math.max(per, Math.floor((p - from) * tr.segs) * per));
+      tr.mesh.material.uniforms.uHead.value = p;
       tr.head.position.copy(tr.curve.getPointAt(p));
     }
 
@@ -347,7 +432,7 @@ export function createScene(canvas, { reduced = false } = {}) {
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
   const hit = (e) => {
     if (e.target.closest?.('a, button, input, select, label, summary, .panel, .chip, .plan')) return null;
-    ndc.set((e.clientX / innerWidth) * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+    ndc.set((e.clientX / canvas.clientWidth) * 2 - 1, -(e.clientY / canvas.clientHeight) * 2 + 1);
     ray.setFromCamera(ndc, camera);
     return ray.intersectObjects([usd, php, pair, card], false).find((h) => h.object.visible)?.object || null;
   };
@@ -376,17 +461,21 @@ export function createScene(canvas, { reduced = false } = {}) {
     gsap.to(F, { card: Math.round(F.card / TAU) * TAU, duration: 0.8, ease: 'power3.out' });
   });
 
-  /** Toss the pair coin. Resolves with 'heads' (dollars) or 'tails' (pesos). */
+  /** Toss the pair coin end over end. Resolves with 'heads' (dollars) or 'tails' (pesos). */
   function toss() {
     const tails = Math.random() < 0.5;
-    const base = Math.ceil((F.pair + 0.001) / TAU) * TAU;
-    const end = base + TAU * 3 + (tails ? Math.PI : 0);
-    if (reduced) { F.pair = end; return Promise.resolve(tails ? 'tails' : 'heads'); }
+    const side = tails ? Math.PI : 0;
+    const x = Math.ceil((F.pairX + 0.001) / TAU) * TAU + TAU * 4 + side;
+    // half a turn about X plus half about Z equals half about Y, the turn the peso face is drawn upright for
+    const z = F.pairZ + (((side - F.pairZ) % TAU) + TAU) % TAU;
+    const result = tails ? 'tails' : 'heads';
+    if (reduced) { Object.assign(F, { pairX: x, pairZ: z }); return Promise.resolve(result); }
     return new Promise((resolve) => {
-      gsap.timeline({ onComplete: () => resolve(tails ? 'tails' : 'heads') })
-        .to(F, { pair: end, duration: 1.4, ease: 'power2.out' }, 0)
-        .to(F, { lift: 0.9, duration: 0.6, ease: 'power2.out' }, 0)
-        .to(F, { lift: 0, duration: 0.8, ease: 'power2.in' }, 0.6);
+      gsap.timeline({ onComplete: () => resolve(result) })
+        .to(F, { pairX: x, duration: 1.25, ease: 'power2.out' }, 0)
+        .to(F, { pairZ: z, duration: 1.25, ease: 'sine.inOut' }, 0)
+        .to(F, { lift: 1.2, duration: 0.55, ease: 'power2.out' }, 0)
+        .to(F, { lift: 0, duration: 0.6, ease: 'power2.in' }, 0.55);
     });
   }
 
